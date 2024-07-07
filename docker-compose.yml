@@ -1,0 +1,43 @@
+services:
+  aggregator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: content_aggregator
+    volumes:
+      - .:/app
+    networks:
+      - content_net
+
+  grafana:
+    image: grafana/grafana
+    container_name: content_grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - content_net  
+  
+  loki:
+    image: grafana/loki
+    container_name: content_loki
+    ports:
+      - "3100:3100"
+    networks:
+      - content_net
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: content_prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    ports:
+      - "9090:9090"
+    networks:
+      - content_net
+
+
+networks:
+  content_net:
+    driver: bridge
